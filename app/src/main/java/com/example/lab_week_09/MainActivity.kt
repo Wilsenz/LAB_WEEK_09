@@ -22,7 +22,17 @@ import androidx.compose.ui.unit.dp
 import com.example.lab_week_09.ui.theme.LAB_WEEK_09Theme
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.foundation.text.KeyboardOptions
-
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateList
+// Declare a data class called Student
+data class Student(
+    val name: String
+)
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,48 +42,87 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    val list = listOf("Tanu", "Tina", "Tono")
-                    Home(list)
+                    // Hapus val list = listOf("Tanu", "Tina", "Tono")
+                    Home() // Panggil Home tanpa parameter
                 }
             }
         }
     }
 }
 
-@Preview(showBackground = true)
+
+
 @Composable
-fun Home(
-    items: List<String>,
+fun Home() {
+    // Di sini, kita membuat mutable state List of Student
+    val listData = remember {
+        mutableStateListOf(
+            Student("Tanu"),
+            Student("Tina"),
+            Student("Tono")
+        )
+    }
+    // Di sini, kita membuat mutable state of Student untuk input field
+    var inputField by remember { mutableStateOf(Student("")) }
+
+    // Hapus Home Content Lama, dan Panggil HomeContent dengan State dan Lambda Functions
+    HomeContent(
+        listData,
+        inputField,
+        onInputValueChange = { input -> inputField = inputField.copy(name = input) },
+        onButtonClick = {
+            // == ASSIGNMENT NO. 1 FIX: Mencegah String Kosong ==
+            if (inputField.name.isNotBlank()) {
+                listData.add(inputField.copy()) // Gunakan .copy() untuk menambahkan objek baru
+            }
+            inputField = Student("") // Reset input field
+        }
+    )
+}
+
+@Composable
+fun HomeContent(
+    listData: SnapshotStateList<Student>,
+    inputField: Student,
+    onInputValueChange: (String) -> Unit,
+    onButtonClick: () -> Unit
 ) {
     LazyColumn {
         item {
             Column(
-                modifier = Modifier.padding(16.dp).fillMaxSize(),
+                modifier = Modifier
+                    .padding(16.dp)
+                    .fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(text = stringResource(
-                    id = R.string.enter_item)
-                )
-                TextField( value = "",
+                Text(text = stringResource(id = R.string.enter_item))
+                TextField(
+                    // Set value dari input field dari State
+                    value = inputField.name,
                     keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Number
+                        // Ganti KeyboardType.Number menjadi KeyboardType.Text
+                        keyboardType = KeyboardType.Text
                     ),
+                    // Set event handler
                     onValueChange = {
+                        onInputValueChange(it)
                     }
                 )
-                Button(onClick = { }) {
-                    Text(text = stringResource(
-                        id = R.string.button_click)
-                    )
+                Button(onClick = onButtonClick) { // Panggil onButtonClick lambda
+                    Text(text = stringResource(id = R.string.button_click))
                 }
             }
         }
-        items(items) { item ->
+        // Tampilkan daftar item
+        items(listData) { item ->
             Column(
-                modifier = Modifier.padding(vertical = 4.dp).fillMaxSize(),
+                modifier = Modifier
+                    .padding(vertical = 4.dp)
+                    .fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(text = item)
+                // Tampilkan item.name dari data class Student
+                Text(text = item.name)
             }
         }
     }
@@ -82,5 +131,11 @@ fun Home(
 @Preview(showBackground = true)
 @Composable
 fun PreviewHome() {
-    Home(listOf("Tanu", "Tina", "Tono"))
+    // Home content preview
+    HomeContent(
+        listData = mutableStateListOf(Student("Tanu"), Student("Tina"), Student("Tono")),
+        inputField = Student(""),
+        onInputValueChange = {},
+        onButtonClick = {}
+    )
 }
