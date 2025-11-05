@@ -29,6 +29,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
+import com.example.lab_week_09.ui.theme.OnBackgroundTitleText
+import com.example.lab_week_09.ui.theme.OnBackgroundItemText
+import com.example.lab_week_09.ui.theme.PrimaryTextButton
 // Declare a data class called Student
 data class Student(
     val name: String
@@ -95,25 +98,25 @@ fun HomeContent(
                     .fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(text = stringResource(id = R.string.enter_item))
+                // Gunakan OnBackgroundTitleText
+                OnBackgroundTitleText(text = stringResource(id = R.string.enter_item))
+
                 TextField(
-                    // Set value dari input field dari State
                     value = inputField.name,
                     keyboardOptions = KeyboardOptions(
-                        // Ganti KeyboardType.Number menjadi KeyboardType.Text
                         keyboardType = KeyboardType.Text
                     ),
-                    // Set event handler
                     onValueChange = {
                         onInputValueChange(it)
                     }
                 )
-                Button(onClick = onButtonClick) { // Panggil onButtonClick lambda
-                    Text(text = stringResource(id = R.string.button_click))
-                }
+                // Gunakan PrimaryTextButton
+                PrimaryTextButton(
+                    text = stringResource(id = R.string.button_click),
+                    onClick = onButtonClick
+                )
             }
         }
-        // Tampilkan daftar item
         items(listData) { item ->
             Column(
                 modifier = Modifier
@@ -121,8 +124,8 @@ fun HomeContent(
                     .fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Tampilkan item.name dari data class Student
-                Text(text = item.name)
+                // Gunakan OnBackgroundItemText
+                OnBackgroundItemText(text = item.name)
             }
         }
     }
